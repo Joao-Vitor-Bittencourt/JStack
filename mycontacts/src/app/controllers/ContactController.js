@@ -1,10 +1,20 @@
+const ContactsRepository = require('../repositories/ContactRepository');
+
 class ContactController {
-  index(request, response) {
-    response.send('Rota Index');
+  async index(request, response) {
+    const contacts = await ContactsRepository.findAll();
+    response.json(contacts);
   }
 
-  show(request, response) {
-    response.send('Rota show');
+  async show(request, response) {
+    const { id } = request.params;
+
+    const contact = await ContactsRepository.findById(id);
+
+    if (!contact) {
+      return response.status(404).json({ error: 'User not found'});
+    }
+    response.json(contact);
   }
 
   store(request, response) {
@@ -15,8 +25,18 @@ class ContactController {
     response.send('Rota update');
   }
 
-  delete(request, response) {
-    response.send('Rota delete');
+  async delete(request, response) {
+    const { id } = request.params;
+
+    const contact = await ContactsRepository.findById(id);
+
+    if (!contact) {
+      return response.status(404).json({ error: 'User not found'});
+    }
+
+    await ContactsRepository.delete(id);
+
+    response.sendStatus(204);
   }
 }
 
